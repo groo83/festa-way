@@ -1,4 +1,5 @@
-import { Festival } from '@/utils/parseFestivalContent';
+import { Festival } from '../utils/parseFestivalContent';
+import React from 'react';
 
 interface FestivalCardProps {
   fest: Festival;

@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { parseFestivalContent, Festival } from '@/utils/parseFestivalContent';
-import FestivalCard from '@/components/FestivalCard';
+import { parseFestivalContent, Festival } from '../utils/parseFestivalContent';
+import FestivalCard from '../components/FestivalCard';
 import ReactMarkdown from 'react-markdown';
+import React from 'react';
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from '@vercel/analytics/next';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'search' | 'recommend'>('search');
@@ -56,7 +59,7 @@ export default function Home() {
     let questionText = buildQuestionText();
 
     try {
-      const response = await axios.post('/api/festival', { question: questionText });
+      const response = await axios.post('/api/v1/festival', { question: questionText });
       console.log(response.data);
 
       const content = response.data.result.choices[0].message.content;
@@ -80,7 +83,7 @@ export default function Home() {
     try {
       const questionText = selectedFestival + ' 관련해서 ' + tripType + ' 코스를 짜줘.';
 
-      const response = await axios.post('/api/course', { question: questionText });
+      const response = await axios.post('/api/v1/course', { question: questionText });
       console.log(response.data);
 
       setCourseResult(response.data.result.choices[0].message.content || '추천 결과가 없습니다.');
@@ -138,7 +141,11 @@ export default function Home() {
   return (
     <div className="container">
       <header>
-        <h1>축제 코스 추천 서비스</h1>
+        <div className="logo">
+            <div className="logo-icon"></div>
+            <div className="logo-text">FESTA WAY</div>
+        </div>
+        <div className="tagline">축제로 가는 길, 당신의 특별한 여정</div>
         <div className="tabs">
           <button onClick={() => setActiveTab('search')} className={activeTab === 'search' ? 'active' : ''}>🔍 조건으로 행사/축제 찾기</button>
           <button onClick={() => setActiveTab('recommend')} className={activeTab === 'recommend' ? 'active' : ''}>✏️ 코스 추천받기</button>
@@ -343,6 +350,9 @@ export default function Home() {
         )}
       </div>
       )}
+      <SpeedInsights />
+      <Analytics />
+
     </div>
   );
 }
