@@ -21,7 +21,7 @@ export default function FestivalCard({ fest, onSelect}: FestivalCardProps) {
     //   >
     //     이 축제로 코스 추천받기
     //   </button>    </div>
-    <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 ease-in-out border border-gray-100 h-full flex flex-col justify-between">
+    <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 ease-in-out border border-gray-100 h-full w-full flex flex-col justify-between">
       <div>
         <h3 className="text-2xl font-extrabold text-gray-800 mb-3">{fest.name}</h3>
         <p className="text-sm text-gray-600 mb-1">
@@ -39,8 +39,8 @@ export default function FestivalCard({ fest, onSelect}: FestivalCardProps) {
         )}
       </div>
       <button
-        className="mt-auto w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold py-2 rounded-lg hover:from-blue-600 hover:to-indigo-600 transition"
-        onClick={() => onSelect(fest.name)}
+          className="mt-auto w-full px-5 py-2 font-semibold text-white rounded-lg bg-gradient-to-r from-[#ff6b6b] via-[#4ecdc4] to-[#45b7d1] bg-[length:200%_200%] animate-[gradientShift_4s_ease-in-out_infinite] shadow-md hover:shadow-lg cursor-pointer transition-all"
+          onClick={() => onSelect(fest.name)}
       >
         이 축제로 코스 추천받기
       </button>

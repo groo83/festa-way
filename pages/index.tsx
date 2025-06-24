@@ -13,7 +13,7 @@ export default function Home() {
   const todayStr = new Date().toISOString().slice(0, 10); // yyyy-mm-dd 형식
   const [startDate, setStartDate] = useState(todayStr);  const [endDate, setEndDate] = useState('');
   const [keywords, setKeywords] = useState<string[]>([]);
-  const [regions, setRegions] = useState<string[]>([]);
+  const [region, setRegion] = useState('');
   const [festivalList, setFestivalList] = useState<Festival[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [courseResult, setCourseResult] = useState('');
@@ -24,17 +24,13 @@ export default function Home() {
   const allKeywords = ['아이', '체험', 'SNS', '포토존', '꽃', '책'];
   const allRegions = ['서울', '경기도', '강원도', '경상도', '충청도', '전라도', '인천', '제주도'];
 
-  const festivals = [
-    { name: '정선 아리랑제', region: '강원도', date: '2025-08-12 ~ 2025-08-15' },
-    { name: '서울 불꽃축제', region: '서울', date: '2025-10-03 ~ 2025-10-03' },
-  ];
 
   const toggleKeyword = (word: string) => {
     setKeywords((prev) => prev.includes(word) ? prev.filter(k => k !== word) : [...prev, word]);
   };
 
   const toggleRegion = (area: string) => {
-    setRegions((prev) => prev.includes(area) ? prev.filter(r => r !== area) : [...prev, area]);
+    setRegion(prev => (prev === area ? '' : area));
   };
 
   const selectTrip = (option: string) => {
@@ -95,7 +91,7 @@ export default function Home() {
   };
 
   const validateFestaSearchInput = (): boolean => {
-    if (!startDate && !endDate && keywords.length == 0 && regions.length == 0) {
+    if (!startDate && !endDate && keywords.length == 0 && !region) {
       alert('조건을 선택해 주세요.');
       return false;
     }
@@ -135,8 +131,8 @@ export default function Home() {
       questionText += `키워드: ${keywords.join(', ')}\n`;
     }
   
-    if (regions.length > 0) {
-      questionText += `지역: ${regions.join(', ')}`;
+    if (region) {
+      questionText += `지역: ${region}`;
     }
   
     return questionText;
@@ -159,7 +155,10 @@ export default function Home() {
 
       {activeTab === 'search' && (
         <div className="search-tab">
-          <div className="filters space-y-6">
+          <div className={`filters space-y-6 transition-opacity duration-300 
+            ${isLoading ? 'pointer-events-none opacity-50' : ''
+            }`}
+          >
             {/* 날짜 조건 */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -219,10 +218,13 @@ export default function Home() {
                   <button
                     key={rg}
                     onClick={() => toggleRegion(rg)}
+                    disabled={isLoading}
                     className={`px-3 py-1 rounded-full text-sm font-medium border transition 
-                      ${regions.includes(rg)
+                      ${region === rg
                         ? 'bg-green-500 text-white border-green-500'
-                        : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'}`}
+                        : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'}
+                        `
+                      }
                   >
                     {rg}
                   </button>
@@ -244,7 +246,7 @@ export default function Home() {
                 setStartDate(today);
                 setEndDate('');
                 setKeywords([]);
-                setRegions([]);
+                setRegion('');
               }}
               title="조건 초기화"
               className="flex items-center gap-1 px-3 py-2 bg-gray-200 hover:bg-red-100 text-gray-700 hover:text-red-600 rounded-md shadow-sm transition-all"
@@ -271,14 +273,14 @@ export default function Home() {
                 ? `${formatDate(startDate)} ~ ${formatDate(endDate)}`
                 : ''}</strong> {' '}
                 <strong>{keywords.join(', ')}</strong> {' '}
-                <strong>{regions.join(', ')}</strong> 조건으로 축제를 추천받고 있어요...</p>
+                <strong>{region}</strong> 조건으로 축제를 추천받고 있어요...</p>
             </div>
           )}
           {!isLoading && festivalList.length > 0 && (
             <div className="festival-cards grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
               {festivalList.map((fest, idx) => (
-                <div key={idx} className="flex justify-center">
-                  <div className="w-full max-w-sm h-full flex">
+                <div key={idx} className="flex justify-center w-[350px]">
+                  <div className="w-full h-full flex">
                     <FestivalCard key={idx} fest={fest} onSelect={handleSelectFestival} />
                   </div>
                 </div>
@@ -289,7 +291,10 @@ export default function Home() {
       )}
       {activeTab === 'recommend' && (
         <div className="recommend-tab">
-          <div className="filters space-y-6">
+          <div className={`filters space-y-6 transition-opacity duration-300 
+            ${isCourseLoading ? 'pointer-events-none opacity-50' : ''
+            }`}
+          >
             <div>
               <label htmlFor="festival-name" className="block text-base font-semibold text-gray-800 mb-1">축제명</label>
               <input id="festival-name" type="text" value={selectedFestival} onChange={(e) => setSelectedFestival(e.target.value)} placeholder="축제명을 입력하세요" className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
@@ -348,7 +353,7 @@ export default function Home() {
             <p>🎯 <strong>{selectedFestival}</strong> 축제를 위한 <strong>{tripType}</strong> 코스를 추천받고 있어요...</p>
           </div>
         )}
-        {courseResult && (
+        {!isCourseLoading && courseResult && (
           <div className="w-full mt-6 p-6 border border-gray-300 rounded-md bg-white text-gray-800 text-base">
             <article className="prose prose-sm sm:prose lg:prose-lg max-w-none">
               <ReactMarkdown>{courseResult}</ReactMarkdown>
