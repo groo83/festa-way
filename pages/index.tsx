@@ -10,9 +10,8 @@ import { Analytics } from '@vercel/analytics/next';
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'search' | 'recommend'>('search');
   const [selectedFestival, setSelectedFestival] = useState('');
-  //const [tripType, setTripType] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const todayStr = new Date().toISOString().slice(0, 10); // yyyy-mm-dd 형식
+  const [startDate, setStartDate] = useState(todayStr);  const [endDate, setEndDate] = useState('');
   const [keywords, setKeywords] = useState<string[]>([]);
   const [regions, setRegions] = useState<string[]>([]);
   const [festivalList, setFestivalList] = useState<Festival[]>([]);
@@ -22,7 +21,7 @@ export default function Home() {
   const [tripType, setTripType] = useState('');
 
   const tripOptions = ['당일치기','1박 2일','2박 3일','3박 4일','4박 5일'];
-  const allKeywords = ['아이', '체험', 'sns', '포토존', '꽃', '책'];
+  const allKeywords = ['아이', '체험', 'SNS', '포토존', '꽃', '책'];
   const allRegions = ['서울', '경기도', '강원도', '경상도', '충청도', '전라도', '인천', '제주도'];
 
   const festivals = [
@@ -50,7 +49,7 @@ export default function Home() {
 
   const handleSearch = async () => {
     // 날짜 유효성 검사
-    if (!validateDateSelection()) {
+    if (!validateFestaSearchInput()) {
       return;
     }
 
@@ -95,15 +94,19 @@ export default function Home() {
     }
   };
 
-  const validateDateSelection = (): boolean => {
+  const validateFestaSearchInput = (): boolean => {
+    if (!startDate && !endDate && keywords.length == 0 && regions.length == 0) {
+      alert('조건을 선택해 주세요.');
+      return false;
+    }
     if (!startDate && endDate) {
       alert('시작일을 선택해 주세요.');
       return false;
     }
-    if (startDate && !endDate) {
-      alert('종료일을 선택해 주세요.');
-      return false;
-    }
+    // if (startDate && !endDate) {
+    //   alert('종료일을 선택해 주세요.');
+    //   return false;
+    // }
     return true;
   };
   
@@ -124,7 +127,9 @@ export default function Home() {
   
     if (startDate && endDate) {
       questionText += `날짜: ${formatDate(startDate)}~${formatDate(endDate)}\n`;
-    } 
+    } else if (startDate && !endDate) {
+      questionText += `날짜: ${formatDate(startDate)}~${formatDate(startDate)}\n`;
+    }
   
     if (keywords.length > 0) {
       questionText += `키워드: ${keywords.join(', ')}\n`;
@@ -147,8 +152,8 @@ export default function Home() {
         </div>
         <div className="tagline">축제로 가는 길, 당신의 특별한 여정</div>
         <div className="tabs">
-          <button onClick={() => setActiveTab('search')} className={activeTab === 'search' ? 'active' : ''}>🔍 조건으로 행사/축제 찾기</button>
-          <button onClick={() => setActiveTab('recommend')} className={activeTab === 'recommend' ? 'active' : ''}>✏️ 코스 추천받기</button>
+          <button onClick={() => setActiveTab('search')} className={`tab-btn ${activeTab === 'search' ? 'active-tab' : ''}`}>🔍 조건으로 행사/축제 찾기</button>
+          <button onClick={() => setActiveTab('recommend')} className={`tab-btn ${activeTab === 'recommend' ? 'active-tab' : ''}`}>✏️ 코스 추천받기</button>
         </div>
       </header>
 
@@ -227,10 +232,16 @@ export default function Home() {
 
             <div className="flex items-center gap-4 mt-4">
 
-              <button className="search-btn" onClick={handleSearch}>🎯 검색</button>
-              <button
+            <button
+              onClick={handleSearch}
+              className="px-5 py-2 font-semibold text-white rounded-md bg-gradient-to-r from-[#ff6b6b] via-[#4ecdc4] to-[#45b7d1] bg-[length:200%_200%] animate-[gradientShift_4s_ease-in-out_infinite] shadow-md hover:shadow-lg cursor-pointer transition-all"
+            >
+              🎯 검색
+            </button>              
+            <button
               onClick={() => {
-                setStartDate('');
+                const today = new Date().toISOString().slice(0, 10);
+                setStartDate(today);
                 setEndDate('');
                 setKeywords([]);
                 setRegions([]);
@@ -264,22 +275,16 @@ export default function Home() {
             </div>
           )}
           {!isLoading && festivalList.length > 0 && (
-            <div className="festival-cards grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
-              {/* {festivals.map((fest, idx) => (
-                <div key={idx} className="card">
-                  <h3>{fest.name}</h3>
-                  <p>{fest.region}</p>
-                  <p>{fest.date}</p>
-                  <button onClick={() => handleSelectFestival(fest.name)}>이 축제로 코스 추천받기</button>
-                </div>
-              ))} */}
+            <div className="festival-cards grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
               {festivalList.map((fest, idx) => (
-                <FestivalCard key={idx} fest={fest} onSelect={handleSelectFestival} />
+                <div key={idx} className="flex justify-center">
+                  <div className="w-full max-w-sm h-full flex">
+                    <FestivalCard key={idx} fest={fest} onSelect={handleSelectFestival} />
+                  </div>
+                </div>
               ))}
-
             </div> 
           )}
-
         </div>
       )}
       {activeTab === 'recommend' && (
@@ -320,7 +325,9 @@ export default function Home() {
 
           </div>
           <div className="flex items-center gap-4 mt-4">
-            <button className="search-btn" onClick={handleCourseRecommend}>🎯 코스 추천받기</button>
+            <button               
+              className="px-5 py-2 font-semibold text-white rounded-md bg-gradient-to-r from-[#ff6b6b] via-[#4ecdc4] to-[#45b7d1] bg-[length:200%_200%] animate-[gradientShift_4s_ease-in-out_infinite] shadow-md hover:shadow-lg cursor-pointer transition-all"
+              onClick={handleCourseRecommend}>🎯 코스 추천받기</button>
             <button
               onClick={() => {
                 setSelectedFestival('');
