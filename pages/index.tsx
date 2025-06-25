@@ -143,7 +143,7 @@ export default function Home() {
         </div>
         <div className="tagline">축제로 가는 길, 당신의 특별한 여정</div>
         <div className="tabs">
-          <button onClick={() => setActiveTab('search')} className={`tab-btn ${activeTab === 'search' ? 'active-tab' : ''}`}>🔍 조건으로 행사/축제 찾기</button>
+          <button onClick={() => setActiveTab('search')} className={`tab-btn ${activeTab === 'search' ? 'active-tab' : ''}`}>🔍 축제 찾기</button>
           <button onClick={() => setActiveTab('recommend')} className={`tab-btn ${activeTab === 'recommend' ? 'active-tab' : ''}`}>✏️ 코스 추천받기</button>
         </div>
       </header>
@@ -185,15 +185,17 @@ export default function Home() {
                 />
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 items-center w-full">
+            <div className="grid grid-cols-1 grid-cols-2 gap-4">
+
+            {/* <div className="flex flex-col sm:flex-row gap-4 items-center w-full"> */}
               {/* 지역 콤보박스 */}
-              <div className="w-full sm:w-1/2">
+              <div className="w-full">
                 <label className="block text-base font-semibold text-gray-800 mb-2" htmlFor="region-select">지역</label>
                 <select
                   id="region-select"
                   value={region}
                   onChange={e => setRegion(e.target.value)}
-                  className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#45b7d1] focus:border-[#45b7d1] min-h-[44px]"
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#45b7d1] focus:border-[#45b7d1] min-h-[44px]"
                   disabled={isLoading}
                 >
                   <option value="">전체</option>
@@ -203,13 +205,13 @@ export default function Home() {
                 </select>
               </div>
               {/* 키워드 콤보박스 (단일 선택) */}
-              <div className="w-full sm:w-1/2">
+              <div className="w-full">
                 <label className="block text-base font-semibold text-gray-800 mb-2" htmlFor="keyword-select">키워드</label>
                 <select
                   id="keyword-select"
                   value={keyword}
                   onChange={e => setKeyword(e.target.value)}
-                  className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4ecdc4] focus:border-[#4ecdc4] min-h-[44px]"
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4ecdc4] focus:border-[#4ecdc4] min-h-[44px]"
                 >
                   <option value="">전체</option>
                   {allKeywords.map(kw => (
