@@ -6,32 +6,26 @@ import ReactMarkdown from 'react-markdown';
 import React from 'react';
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from '@vercel/analytics/next';
+import Footer from '../components/Footer'; 
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'search' | 'recommend'>('search');
   const [selectedFestival, setSelectedFestival] = useState('');
   const todayStr = new Date().toISOString().slice(0, 10); // yyyy-mm-dd 형식
   const [startDate, setStartDate] = useState(todayStr);  const [endDate, setEndDate] = useState('');
-  const [keywords, setKeywords] = useState<string[]>([]);
+  const [keyword, setKeyword] = useState<string>('');
   const [region, setRegion] = useState('');
   const [festivalList, setFestivalList] = useState<Festival[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [courseResult, setCourseResult] = useState('');
   const [isCourseLoading, setIsCourseLoading] = useState(false);
   const [tripType, setTripType] = useState('');
+  const [isFallbackResult, setIsFallbackResult] = useState(false);
 
   const tripOptions = ['당일치기','1박 2일','2박 3일','3박 4일','4박 5일'];
-  const allKeywords = ['아이', '체험', 'SNS', '포토존', '꽃', '책'];
-  const allRegions = ['서울', '경기도', '강원도', '경상도', '충청도', '전라도', '인천', '제주도'];
+  const allKeywords = ['가족', '푸드', '자연', '포토존', '걷기', '예술', '역사', '책'];
+  const allRegions = ['서울', '경기도', '대전', '대구', '광주', '부산','울산', '세종특별자치시', '강원특별자치도', '충청북도', '충청남도', '경상북도', '경상남도', '전북특별자치도', '전라남도', '제주도']; 
 
-
-  const toggleKeyword = (word: string) => {
-    setKeywords((prev) => prev.includes(word) ? prev.filter(k => k !== word) : [...prev, word]);
-  };
-
-  const toggleRegion = (area: string) => {
-    setRegion(prev => (prev === area ? '' : area));
-  };
 
   const selectTrip = (option: string) => {
     setTripType(option);
@@ -49,7 +43,7 @@ export default function Home() {
       return;
     }
 
-    setIsLoading(true); // 로딩 시작
+    setIsLoading(true); 
 
     let questionText = buildQuestionText();
 
@@ -58,12 +52,14 @@ export default function Home() {
       console.log(response.data);
 
       const content = response.data.result.choices[0].message.content;
+      const isFallback = content.includes("확인되지 않았습니다");
       const parsedList = parseFestivalContent(content);
+      setIsFallbackResult(isFallback);
       setFestivalList(parsedList);
     } catch (error) {
       console.error(error);
     } finally {
-      setIsLoading(false); // 로딩 종료
+      setIsLoading(false);
     }
   };
 
@@ -91,7 +87,7 @@ export default function Home() {
   };
 
   const validateFestaSearchInput = (): boolean => {
-    if (!startDate && !endDate && keywords.length == 0 && !region) {
+    if (!startDate && !endDate && keyword.length == 0 && !region) {
       alert('조건을 선택해 주세요.');
       return false;
     }
@@ -127,8 +123,8 @@ export default function Home() {
       questionText += `날짜: ${formatDate(startDate)}~${formatDate(startDate)}\n`;
     }
   
-    if (keywords.length > 0) {
-      questionText += `키워드: ${keywords.join(', ')}\n`;
+    if (keyword) {
+      questionText += `키워드: ${keyword}\n`;
     }
   
     if (region) {
@@ -155,7 +151,7 @@ export default function Home() {
 
       {activeTab === 'search' && (
         <div className="search-tab">
-          <div className={`filters space-y-6 transition-opacity duration-300 
+          <div className={`filters space-y-6 transition-opacity duration-300 max-w-[720px] mx-auto
             ${isLoading ? 'pointer-events-none opacity-50' : ''
             }`}
           >
@@ -191,44 +187,38 @@ export default function Home() {
               </div>
             </div>
 
-            {/* 키워드 조건 */}
-            <div>
-              <span className="block text-base font-semibold text-gray-800 mb-2">키워드</span>
-              <div className="flex flex-wrap gap-2">
-                {allKeywords.map((kw) => (
-                  <button
-                    key={kw}
-                    onClick={() => toggleKeyword(kw)}
-                    className={`px-3 py-1 rounded-full text-sm font-medium border transition 
-                      ${keywords.includes(kw)
-                        ? 'bg-blue-500 text-white border-blue-500'
-                        : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'}`}
-                  >
-                    {kw}
-                  </button>
-                ))}
+            {/* 키워드/지역 조건: 콤보박스 row */}
+            <div className="flex flex-col sm:flex-row gap-4 items-center w-full">
+              {/* 키워드 콤보박스 (단일 선택) */}
+              <div className="w-full sm:w-1/2">
+                <label className="block text-base font-semibold text-gray-800 mb-2" htmlFor="keyword-select">키워드</label>
+                <select
+                  id="keyword-select"
+                  value={keyword}
+                  onChange={e => setKeyword(e.target.value)}
+                  className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4ecdc4] focus:border-[#4ecdc4] min-h-[44px]"
+                >
+                  <option value="">전체</option>
+                  {allKeywords.map(kw => (
+                    <option key={kw} value={kw}>{kw}</option>
+                  ))}
+                </select>
               </div>
-            </div>
-
-            {/* 지역 조건 */}
-            <div>
-            <span className="block text-base font-semibold text-gray-800 mb-2">지역</span>
-              <div className="flex flex-wrap gap-2">
-                {allRegions.map((rg) => (
-                  <button
-                    key={rg}
-                    onClick={() => toggleRegion(rg)}
-                    disabled={isLoading}
-                    className={`px-3 py-1 rounded-full text-sm font-medium border transition 
-                      ${region === rg
-                        ? 'bg-green-500 text-white border-green-500'
-                        : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'}
-                        `
-                      }
-                  >
-                    {rg}
-                  </button>
-                ))}
+              {/* 지역 콤보박스 */}
+              <div className="w-full sm:w-1/2">
+                <label className="block text-base font-semibold text-gray-800 mb-2" htmlFor="region-select">지역</label>
+                <select
+                  id="region-select"
+                  value={region}
+                  onChange={e => setRegion(e.target.value)}
+                  className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#45b7d1] focus:border-[#45b7d1] min-h-[44px]"
+                  disabled={isLoading}
+                >
+                  <option value="">전체</option>
+                  {allRegions.map(rg => (
+                    <option key={rg} value={rg}>{rg}</option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -245,7 +235,7 @@ export default function Home() {
                 const today = new Date().toISOString().slice(0, 10);
                 setStartDate(today);
                 setEndDate('');
-                setKeywords([]);
+                setKeyword('');
                 setRegion('');
               }}
               title="조건 초기화"
@@ -267,15 +257,41 @@ export default function Home() {
           </div>
 
           {isLoading && (
-            <div className="result-box">
+            <div className="result-box max-w-[720px] mx-auto">
               <p>🎯 
                 <strong> {startDate && endDate
                 ? `${formatDate(startDate)} ~ ${formatDate(endDate)}`
+                : startDate && !endDate
+                ? `${formatDate(startDate)} ~ ${formatDate(startDate)}`
                 : ''}</strong> {' '}
-                <strong>{keywords.join(', ')}</strong> {' '}
+                <strong>{keyword}</strong> {' '}
                 <strong>{region}</strong> 조건으로 축제를 추천받고 있어요...</p>
             </div>
           )}
+          {isFallbackResult && !isLoading && (
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-md shadow-sm mb-4 max-w-[720px] mx-auto">
+              <div className="flex items-start gap-2">
+                <svg
+                  className="h-5 w-5 mt-1 text-yellow-500"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
+                  />
+                </svg>
+                <div>
+                  <p className="font-semibold">조건에 맞는 축제를 찾을 수 없습니다.</p>
+                  <p className="text-sm">대신 관련 축제를 추천해드릴게요! 아래 목록을 참고해보세요.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {!isLoading && festivalList.length > 0 && (
             <div className="festival-cards grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
               {festivalList.map((fest, idx) => (
@@ -291,7 +307,7 @@ export default function Home() {
       )}
       {activeTab === 'recommend' && (
         <div className="recommend-tab">
-          <div className={`filters space-y-6 transition-opacity duration-300 
+          <div className={`filters space-y-6 transition-opacity duration-300 max-w-[720px] mx-auto
             ${isCourseLoading ? 'pointer-events-none opacity-50' : ''
             }`}
           >
@@ -319,7 +335,7 @@ export default function Home() {
                     className={
                       `px-4 py-2 rounded-full text-sm font-medium border transition focus:outline-none ` +
                       (tripType === option
-                        ? 'bg-blue-500 text-white border-blue-500'
+                        ? 'bg-[#4ecdc4] text-white border-[#4ecdc4]'
                         : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200')
                     }
                   >
@@ -349,7 +365,7 @@ export default function Home() {
           </div>
         </div>
         {isCourseLoading && (
-          <div className="result-box">
+          <div className="result-box max-w-[720px] mx-auto">
             <p>🎯 <strong>{selectedFestival}</strong> 축제를 위한 <strong>{tripType}</strong> 코스를 추천받고 있어요...</p>
           </div>
         )}
@@ -364,7 +380,7 @@ export default function Home() {
       )}
       <SpeedInsights />
       <Analytics />
-
+      <Footer />
     </div>
   );
 }
