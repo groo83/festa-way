@@ -132,7 +132,7 @@ export default function Home() {
   
     return questionText;
   };
-  
+
 
   return (
     <div className="container">
@@ -322,23 +322,23 @@ export default function Home() {
             </div>
 
           <div>
-            {/* 여행 형태: 버튼 UI */}
-              <span className="block text-base font-semibold text-gray-800 mb-2">여행 형태</span>
-              <div className="flex flex-wrap gap-2">
-                {tripOptions.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => selectTrip(option)}
-                    className={
-                      `px-4 py-2 rounded-full text-sm font-medium border transition focus:outline-none ` +
-                      (tripType === option
-                        ? 'bg-[#4ecdc4] text-white border-[#4ecdc4]'
-                        : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200')
-                    }
-                  >
-                    {option}
-                  </button>
+          {/* 여행 형태: 버튼 UI */}
+            <span className="block text-base font-semibold text-gray-800 mb-2">여행 형태</span>
+            <div className="flex flex-wrap gap-2">
+              {tripOptions.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => selectTrip(option)}
+                  className={
+                    `px-4 py-2 rounded-full text-sm font-medium border transition focus:outline-none ` +
+                    (tripType === option
+                      ? 'bg-[#4ecdc4] text-white border-[#4ecdc4]'
+                      : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200')
+                  }
+                >
+                  {option}
+                </button>
               )
               )}
             </div>
