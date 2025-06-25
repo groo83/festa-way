@@ -2,11 +2,11 @@ import { useState } from 'react';
 import axios from 'axios';
 import { parseFestivalContent, Festival } from '../utils/parseFestivalContent';
 import FestivalCard from '../components/FestivalCard';
-import ReactMarkdown from 'react-markdown';
 import React from 'react';
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from '@vercel/analytics/next';
 import Footer from '../components/Footer'; 
+import MarkdownViewer from '../components/MarkdownViewer';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'search' | 'recommend'>('search');
@@ -21,9 +21,8 @@ export default function Home() {
   const [isCourseLoading, setIsCourseLoading] = useState(false);
   const [tripType, setTripType] = useState('');
   const [isFallbackResult, setIsFallbackResult] = useState(false);
-
   const tripOptions = ['당일치기','1박 2일','2박 3일','3박 4일','4박 5일'];
-  const allKeywords = ['가족', '푸드', '자연', '포토존', '걷기', '예술', '역사', '책'];
+  const allKeywords = ['가족', '음식', '자연', '포토존', '걷기', '예술', '역사', '책'];
   const allRegions = ['서울', '경기도', '대전', '대구', '광주', '부산','울산', '세종특별자치시', '강원특별자치도', '충청북도', '충청남도', '경상북도', '경상남도', '전북특별자치도', '전라남도', '제주도']; 
 
 
@@ -76,7 +75,7 @@ export default function Home() {
 
       const response = await axios.post('/api/v1/course', { question: questionText });
       console.log(response.data);
-
+      console.log(response.data.result.choices[0].message.content);
       setCourseResult(response.data.result.choices[0].message.content || '추천 결과가 없습니다.');
     } catch (err) {
       console.error(err);
@@ -186,24 +185,7 @@ export default function Home() {
                 />
               </div>
             </div>
-
-            {/* 키워드/지역 조건: 콤보박스 row */}
             <div className="flex flex-col sm:flex-row gap-4 items-center w-full">
-              {/* 키워드 콤보박스 (단일 선택) */}
-              <div className="w-full sm:w-1/2">
-                <label className="block text-base font-semibold text-gray-800 mb-2" htmlFor="keyword-select">키워드</label>
-                <select
-                  id="keyword-select"
-                  value={keyword}
-                  onChange={e => setKeyword(e.target.value)}
-                  className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4ecdc4] focus:border-[#4ecdc4] min-h-[44px]"
-                >
-                  <option value="">전체</option>
-                  {allKeywords.map(kw => (
-                    <option key={kw} value={kw}>{kw}</option>
-                  ))}
-                </select>
-              </div>
               {/* 지역 콤보박스 */}
               <div className="w-full sm:w-1/2">
                 <label className="block text-base font-semibold text-gray-800 mb-2" htmlFor="region-select">지역</label>
@@ -217,6 +199,21 @@ export default function Home() {
                   <option value="">전체</option>
                   {allRegions.map(rg => (
                     <option key={rg} value={rg}>{rg}</option>
+                  ))}
+                </select>
+              </div>
+              {/* 키워드 콤보박스 (단일 선택) */}
+              <div className="w-full sm:w-1/2">
+                <label className="block text-base font-semibold text-gray-800 mb-2" htmlFor="keyword-select">키워드</label>
+                <select
+                  id="keyword-select"
+                  value={keyword}
+                  onChange={e => setKeyword(e.target.value)}
+                  className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4ecdc4] focus:border-[#4ecdc4] min-h-[44px]"
+                >
+                  <option value="">전체</option>
+                  {allKeywords.map(kw => (
+                    <option key={kw} value={kw}>{kw}</option>
                   ))}
                 </select>
               </div>
@@ -237,6 +234,7 @@ export default function Home() {
                 setEndDate('');
                 setKeyword('');
                 setRegion('');
+                setFestivalList([]);
               }}
               title="조건 초기화"
               className="flex items-center gap-1 px-3 py-2 bg-gray-200 hover:bg-red-100 text-gray-700 hover:text-red-600 rounded-md shadow-sm transition-all"
@@ -293,6 +291,7 @@ export default function Home() {
           )}
 
           {!isLoading && festivalList.length > 0 && (
+            <>
             <div className="festival-cards grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
               {festivalList.map((fest, idx) => (
                 <div key={idx} className="flex justify-center w-[350px]">
@@ -302,7 +301,13 @@ export default function Home() {
                 </div>
               ))}
             </div> 
+            <div className="mt-6 p-4  max-w-[740px] mx-auto text-yellow-800 rounded-md text-sm">
+            ⚠️ 진행일정은 기상 상황 등으로 인해 변동될 수 있습니다.  
+              방문 전에는 반드시 공식 홈페이지나 주최 측 공지사항을 확인해 주세요.
+            </div>
+            </>
           )}
+
         </div>
       )}
       {activeTab === 'recommend' && (
@@ -317,13 +322,6 @@ export default function Home() {
             </div>
 
           <div>
-            {/* <div className="flex gap-6">
-              {['당일치기','1박 2일','2박 3일','3박 4일','4박 5일'].map((label) => (
-                <label key={label} className="inline-flex items-center">
-                  <input type="radio" name="trip" value={label} checked={tripType === label} onChange={(e) => setTripType(e.target.value)} className="mr-2" /> {label}
-                </label>
-              ))}
-            </div> */}
             {/* 여행 형태: 버튼 UI */}
               <span className="block text-base font-semibold text-gray-800 mb-2">여행 형태</span>
               <div className="flex flex-wrap gap-2">
@@ -341,7 +339,8 @@ export default function Home() {
                   >
                     {option}
                   </button>
-                ))}
+              )
+              )}
             </div>
 
           </div>
@@ -370,10 +369,8 @@ export default function Home() {
           </div>
         )}
         {!isCourseLoading && courseResult && (
-          <div className="w-full mt-6 p-6 border border-gray-300 rounded-md bg-white text-gray-800 text-base">
-            <article className="prose prose-sm sm:prose lg:prose-lg max-w-none">
-              <ReactMarkdown>{courseResult}</ReactMarkdown>
-            </article>
+          <div className="w-full mt-6 p-6 border border-gray-300 rounded-md bg-white text-gray-800 text-base max-w-[720px] mx-auto">
+            <MarkdownViewer markdown={courseResult} />
           </div>
         )}
       </div>
