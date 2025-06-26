@@ -38,7 +38,7 @@ const LoadingUI: React.FC<LoadingUIProps> = ({ messages = defaultMessages }) => 
         />
       ))}
 
-      <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-16 shadow-xl text-center space-y-8">
+      <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-8 sm:p-16 shadow-xl text-center space-y-6 sm:space-y-8 max-w-xs sm:max-w-md mx-4">
         {/* Logo Section */}
         <div className="logo">
           <div className="logo-icon"></div>
@@ -47,11 +47,11 @@ const LoadingUI: React.FC<LoadingUIProps> = ({ messages = defaultMessages }) => 
 
         {/* Circular Loading Spinner */}
         <div className="flex justify-center">
-          <div className="w-12 h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
         </div>
 
         {/* Gradient-styled Message */}
-        <div className="text-lg font-bold bg-gradient-to-r from-[#ff6b6b] via-[#4ecdc4] to-[#45b7d1] bg-clip-text text-transparent animate-loading-messageSlide">
+        <div className="text-lg sm:text-xl font-bold bg-gradient-to-r from-[#ff6b6b] via-[#4ecdc4] to-[#45b7d1] bg-clip-text text-transparent animate-loading-messageSlide">
           {messages[messageIndex]}
         </div>
       </div>
@@ -73,41 +73,26 @@ const LoadingUI: React.FC<LoadingUIProps> = ({ messages = defaultMessages }) => 
           align-items: center;
           justify-content: center;
           gap: 15px;
-          margin-bottom: 10px;
+          margin-bottom: 8px;
         }
         .logo-icon {
-          width: 40px;
-          height: 40px;
+          width: 32px;
+          height: 32px;
+          sm-width: 40px;
+          sm-height: 40px;
           background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
           background-size: 200% 200%;
           border-radius: 50% 20% 50% 20%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: relative;
           animation: loading-gradientShift 3s ease-in-out infinite;
           box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
         }
-        .logo-icon::before {
-          content: '';
-          position: absolute;
-          width: 30px;
-          height: 4px;
-          background: white;
-          border-radius: 2px;
-          box-shadow: 0 8px 0 white, 0 16px 0 white;
-          animation: loading-pulse 2s ease-in-out infinite;
-          top: 35%;
-          transform: translateY(-50%);
-        }
         .logo-text {
-          font-size: 40px;
+          font-size: 24px;
+          sm-font-size: 40px;
           font-weight: 800;
           background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
-          background-size: 200% 200%;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
           background-clip: text;
+          -webkit-text-fill-color: transparent;
           animation: loading-textGradient 4s ease-in-out infinite;
           letter-spacing: -1px;
         }
@@ -115,10 +100,6 @@ const LoadingUI: React.FC<LoadingUIProps> = ({ messages = defaultMessages }) => 
         @keyframes loading-gradientShift {
           0%,100% { background-position:0% 50%; }
           50% { background-position:100% 50%; }
-        }
-        @keyframes loading-pulse {
-          0%,100% { opacity:1; transform: scale(1); }
-          50% { opacity:0.7; transform: scale(0.9); }
         }
         @keyframes loading-messageSlide {
           0%,100% { opacity:1; transform: translateY(0); }
