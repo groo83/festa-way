@@ -167,7 +167,7 @@ export default function Home() {
                   value={startDate}
                   max={endDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#4ecdc4] focus:border-[#4ecdc4]"
                 />
               </div>
               <div>
@@ -181,8 +181,9 @@ export default function Home() {
                   value={endDate}
                   min={startDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#4ecdc4] focus:border-[#4ecdc4]"
                 />
+
               </div>
             </div>
             <div className="grid grid-cols-1 grid-cols-2 gap-4">
@@ -318,11 +319,30 @@ export default function Home() {
             ${isCourseLoading ? 'pointer-events-none opacity-50' : ''
             }`}
           >
-            <div>
-              <label htmlFor="festival-name" className="block text-base font-semibold text-gray-800 mb-1">축제명</label>
-              <input id="festival-name" type="text" value={selectedFestival} onChange={(e) => setSelectedFestival(e.target.value)} placeholder="축제명을 입력하세요" className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-            </div>
-
+          <div>
+            <label htmlFor="festival-input" className="block text-base font-semibold text-gray-800 mb-1">
+              축제명 또는 지역명
+            </label>
+            <input
+              id="festival-input"
+              list="festival-region-list"
+              type="text"
+              value={selectedFestival}
+              onChange={(e) => setSelectedFestival(e.target.value)}
+              placeholder="예) 해운대 모래축제, 서울"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4ecdc4] focus:border-[#4ecdc4]"
+            />
+            <datalist id="festival-region-list">
+              {/* 이미 불러온 축제 리스트가 있다면, 그 이름들도 추가 */}
+              {festivalList.map((f) => (
+                <option key={f.name} value={f.name} />
+              ))}
+              {/* region 옵션 */}
+              {allRegions.map((rg) => (
+                <option key={rg} value={rg} />
+              ))}
+            </datalist>
+          </div>
           <div>
           {/* 여행 형태: 버튼 UI */}
             <span className="block text-base font-semibold text-gray-800 mb-2">여행 형태</span>
