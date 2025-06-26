@@ -7,6 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from '@vercel/analytics/next';
 import Footer from '../components/Footer'; 
 import MarkdownViewer from '../components/MarkdownViewer';
+import Loading from '../components/Loding';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'search' | 'recommend'>('search');
@@ -24,7 +25,7 @@ export default function Home() {
   const tripOptions = ['당일치기','1박 2일','2박 3일','3박 4일','4박 5일'];
   const allKeywords = ['가족', '음식', '자연', '포토존', '걷기', '예술', '역사', '책'];
   const allRegions = ['서울', '경기도', '대전', '대구', '광주', '부산','울산', '세종특별자치시', '강원특별자치도', '충청북도', '충청남도', '경상북도', '경상남도', '전북특별자치도', '전라남도', '제주도']; 
-
+  const message =  keyword + ' ' + region + '조건으로 축제를 추천받고 있어요.';
 
   const selectTrip = (option: string) => {
     setTripType(option);
@@ -141,7 +142,7 @@ export default function Home() {
             <div className="logo-icon"></div>
             <div className="logo-text">FESTA WAY</div>
         </div>
-        <div className="tagline">축제로 가는 길, 당신의 특별한 여정</div>
+        <div className="tagline">쉽고 빠른 나들이 계획, AI 축제·여행 플래너 Festa Way와 함께</div>
         <div className="tabs">
           <button onClick={() => setActiveTab('search')} className={`tab-btn ${activeTab === 'search' ? 'active-tab' : ''}`}>🔍 축제 찾기</button>
           <button onClick={() => setActiveTab('recommend')} className={`tab-btn ${activeTab === 'recommend' ? 'active-tab' : ''}`}>✏️ 코스 추천받기</button>
@@ -256,18 +257,8 @@ export default function Home() {
             </button>
             </div>
           </div>
-
           {isLoading && (
-            <div className="result-box max-w-[720px] mx-auto">
-              <p>🎯 
-                <strong> {startDate && endDate
-                ? `${formatDate(startDate)} ~ ${formatDate(endDate)}`
-                : startDate && !endDate
-                ? `${formatDate(startDate)} ~ ${formatDate(startDate)}`
-                : ''}</strong> {' '}
-                <strong>{keyword}</strong> {' '}
-                <strong>{region}</strong> 조건으로 축제를 추천받고 있어요...</p>
-            </div>
+            <Loading messages={['최고의 축제를 찾는 중...', '축제 정보를 불러오는 중...', '즐거운 경험을 준비하는 중...']} />
           )}
           {isFallbackResult && !isLoading && (
             <div className="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-md shadow-sm mb-4 max-w-[720px] mx-auto">
@@ -386,9 +377,7 @@ export default function Home() {
           </div>
         </div>
         {isCourseLoading && (
-          <div className="result-box max-w-[720px] mx-auto">
-            <p>🎯 <strong>{selectedFestival}</strong> 축제를 위한 <strong>{tripType}</strong> 코스를 추천받고 있어요...</p>
-          </div>
+            <Loading messages={['특별한 여정을 준비하는 중..', '추천 코스를 불러오는 중...', '즐거운 경험을 준비하는 중...']} />
         )}
         {!isCourseLoading && courseResult && (
           <div className="w-full mt-6 p-6 border border-gray-300 rounded-md bg-white text-gray-800 text-base max-w-[720px] mx-auto">
