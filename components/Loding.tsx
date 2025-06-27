@@ -38,7 +38,7 @@ const LoadingUI: React.FC<LoadingUIProps> = ({ messages = defaultMessages }) => 
         />
       ))}
 
-      <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-8 sm:p-16 shadow-xl text-center space-y-6 sm:space-y-8 max-w-xs sm:max-w-md mx-4">
+      <div className="bg-white/60 backdrop-blur-lg border border-white/20 rounded-2xl rounded-t-2xl overflow-hidden p-8 sm:p-16 shadow-xl text-center space-y-6 sm:space-y-8 max-w-xs sm:max-w-md mx-4">
         {/* Logo Section */}
         <div className="logo">
           <div className="logo-icon"></div>
@@ -76,8 +76,8 @@ const LoadingUI: React.FC<LoadingUIProps> = ({ messages = defaultMessages }) => 
           margin-bottom: 8px;
         }
         .logo-icon {
-          width: 32px;
-          height: 32px;
+          width: 38px;
+          height: 38px;
           sm-width: 40px;
           sm-height: 40px;
           background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);

@@ -142,7 +142,7 @@ export default function Home() {
             <div className="logo-icon"></div>
             <div className="logo-text">FESTA WAY</div>
         </div>
-        <div className="tagline">쉽고 빠른 나들이 계획, AI 축제·여행 플래너 Festa Way와 함께</div>
+        <div className="tagline">쉽고 빠른 나들이 계획, AI 축제·여행 플래너</div>
         <div className="tabs">
           <button onClick={() => setActiveTab('search')} className={`tab-btn ${activeTab === 'search' ? 'active-tab' : ''}`}>🔍 축제 찾기</button>
           <button onClick={() => setActiveTab('recommend')} className={`tab-btn ${activeTab === 'recommend' ? 'active-tab' : ''}`}>✏️ 코스 추천받기</button>
