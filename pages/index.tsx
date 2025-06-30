@@ -9,6 +9,8 @@ import Footer from '../components/Footer';
 import MarkdownViewer from '../components/MarkdownViewer';
 import Loading from '../components/Loding';
 import ErrorToast from '../components/ErrorToast';
+import SearchFilters from '../components/SearchFilters';
+import RecommendationFilters from '../components/RecommendationFilters';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'search' | 'recommend'>('search');
@@ -99,10 +101,7 @@ export default function Home() {
       alert('시작일을 선택해 주세요.');
       return false;
     }
-    // if (startDate && !endDate) {
-    //   alert('종료일을 선택해 주세요.');
-    //   return false;
-    // }
+    
     return true;
   };
   
@@ -192,105 +191,22 @@ export default function Home() {
 
       {activeTab === 'search' && (
         <div className="search-tab">
-          <div className={`filters space-y-6 transition-opacity duration-300 max-w-[720px] mx-auto
-            ${isLoading ? 'pointer-events-none opacity-50' : ''
-            }`}
-          >
-            {/* 날짜 조건 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-              <label
-                htmlFor="start-date"
-                className="block text-base font-semibold text-gray-800 mb-1"
-              >시작일</label>
-                <input
-                  id="start-date"
-                  type="date"
-                  value={startDate}
-                  max={endDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#4ecdc4] focus:border-[#4ecdc4]"
-                />
-              </div>
-              <div>
-              <label
-                htmlFor="start-date"
-                className="block text-base font-semibold text-gray-800 mb-1"
-              >종료일</label>
-                <input
-                  id="end-date"
-                  type="date"
-                  value={endDate}
-                  min={startDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#4ecdc4] focus:border-[#4ecdc4]"
-                />
+          <SearchFilters
+            startDate={startDate}
+            endDate={endDate}
+            region={region}
+            keyword={keyword}
+            isLoading={isLoading}
+            allRegions={allRegions}
+            allKeywords={allKeywords}
+            onChangeStartDate={setStartDate}
+            onChangeEndDate={setEndDate}
+            onChangeRegion={setRegion}
+            onChangeKeyword={setKeyword}
+            onSearch={handleSearch}
+            onReset={resetSearchFilters}
+          />
 
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-            {/* <div className="flex flex-col sm:flex-row gap-4 items-center w-full"> */}
-              {/* 지역 콤보박스 */}
-              <div className="w-full">
-                <label className="block text-base font-semibold text-gray-800 mb-2" htmlFor="region-select">지역</label>
-                <select
-                  id="region-select"
-                  value={region}
-                  onChange={e => setRegion(e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#45b7d1] focus:border-[#45b7d1] min-h-[44px]"
-                  disabled={isLoading}
-                >
-                  <option value="">전체</option>
-                  {allRegions.map(rg => (
-                    <option key={rg} value={rg}>{rg}</option>
-                  ))}
-                </select>
-              </div>
-              {/* 키워드 콤보박스 (단일 선택) */}
-              <div className="w-full">
-                <label className="block text-base font-semibold text-gray-800 mb-2" htmlFor="keyword-select">키워드</label>
-                <select
-                  id="keyword-select"
-                  value={keyword}
-                  onChange={e => setKeyword(e.target.value)}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4ecdc4] focus:border-[#4ecdc4] min-h-[44px]"
-                >
-                  <option value="">전체</option>
-                  {allKeywords.map(kw => (
-                    <option key={kw} value={kw}>{kw}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 mt-4">
-
-            <button
-              onClick={handleSearch}
-              className="px-5 py-2 font-semibold text-white rounded-md bg-gradient-to-r from-[#ff6b6b] via-[#4ecdc4] to-[#45b7d1] bg-[length:200%_200%] animate-[gradientShift_4s_ease-in-out_infinite] shadow-md hover:shadow-lg cursor-pointer transition-all"
-            >
-              🎯 검색
-            </button>              
-            <button
-              onClick={resetSearchFilters}
-              title="조건 초기화"
-              className="flex items-center gap-1 px-3 py-2 bg-gray-200 hover:bg-red-100 text-gray-700 hover:text-red-600 rounded-md shadow-sm transition-all"
-            >
-              {/* 아이콘 (refresh) */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 25 25"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8.003 8.003 0 0114.32-4.906M20 14a8.003 8.003 0 01-14.32 4.906" />
-              </svg>
-            </button>
-            </div>
-          </div>
           {isLoading && (
             <Loading messages={['최고의 축제를 찾는 중...', '축제 정보를 불러오는 중...', '즐거운 경험을 준비하는 중...']} />
           )}
@@ -340,81 +256,26 @@ export default function Home() {
       )}
       {activeTab === 'recommend' && (
         <div className="recommend-tab">
-          <div className={`filters space-y-6 transition-opacity duration-300 max-w-[720px] mx-auto
-            ${isCourseLoading ? 'pointer-events-none opacity-50' : ''
-            }`}
-          >
-          <div>
-            <label htmlFor="festival-input" className="block text-base font-semibold text-gray-800 mb-1">
-              축제명 또는 지역명
-            </label>
-            <input
-              id="festival-input"
-              list="festival-region-list"
-              type="text"
-              value={selectedFestivalName}
-              onChange={(e) => setSelectedFestivalName(e.target.value)}              
-              placeholder="예) 해운대 모래축제, 서울"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4ecdc4] focus:border-[#4ecdc4]"
-            />
-            <datalist id="festival-region-list">
-              {/* 이미 불러온 축제 리스트가 있다면, 그 이름들도 추가 */}
-              {festivalList.map((f) => (
-                <option key={`${f.name}-${f.location}`} value={f.name} />
-              ))}
-              {/* region 옵션 */}
-              {allRegions.map((rg) => (
-                <option key={rg} value={rg} />
-              ))}
-            </datalist>
-          </div>
-          <div>
-          {/* 여행 형태: 버튼 UI */}
-            <span className="block text-base font-semibold text-gray-800 mb-2">여행 형태</span>
-            <div className="flex flex-wrap gap-2">
-              {tripOptions.map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  onClick={() => selectTrip(option)}
-                  className={
-                    `px-4 py-2 rounded-full text-sm font-medium border transition focus:outline-none ` +
-                    (tripType === option
-                      ? 'bg-[#4ecdc4] text-white border-[#4ecdc4]'
-                      : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200')
-                  }
-                >
-                  {option}
-                </button>
-              )
-              )}
+          <RecommendationFilters
+            selectedFestivalName={selectedFestivalName}
+            tripType={tripType}
+            festivalList={festivalList}
+            allRegions={allRegions}
+            tripOptions={tripOptions}
+            onChangeFestivalName={setSelectedFestivalName}
+            onSelectTripType={selectTrip}
+            onRecommend={handleCourseRecommend}
+            onReset={resetRecommendation}
+          />
+          {isCourseLoading && (
+              <Loading messages={['특별한 여정을 준비하는 중..', '추천 코스를 불러오는 중...', '즐거운 경험을 준비하는 중...']} />
+          )}
+          {!isCourseLoading && courseResult && (
+            <div className="w-full mt-6 p-6 border border-gray-300 rounded-md bg-white text-gray-800 text-base max-w-[720px] mx-auto">
+              <MarkdownViewer markdown={courseResult} />
             </div>
-
-          </div>
-          <div className="flex items-center gap-4 mt-4">
-            <button               
-              className="px-5 py-2 font-semibold text-white rounded-md bg-gradient-to-r from-[#ff6b6b] via-[#4ecdc4] to-[#45b7d1] bg-[length:200%_200%] animate-[gradientShift_4s_ease-in-out_infinite] shadow-md hover:shadow-lg cursor-pointer transition-all"
-              onClick={handleCourseRecommend}>🎯 코스 추천받기</button>
-            <button
-              onClick={resetRecommendation}
-              title="조건 초기화"
-              className="flex items-center gap-1 px-3 py-2 bg-gray-200 hover:bg-red-100 text-gray-700 hover:text-red-600 rounded-md shadow-sm transition-all"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 25 25" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v6h6M20 20v-6h-6M4 10a8.003 8.003 0 0114.32-4.906M20 14a8.003 8.003 0 01-14.32 4.906" />
-              </svg>
-            </button>
-          </div>
+          )}
         </div>
-        {isCourseLoading && (
-            <Loading messages={['특별한 여정을 준비하는 중..', '추천 코스를 불러오는 중...', '즐거운 경험을 준비하는 중...']} />
-        )}
-        {!isCourseLoading && courseResult && (
-          <div className="w-full mt-6 p-6 border border-gray-300 rounded-md bg-white text-gray-800 text-base max-w-[720px] mx-auto">
-            <MarkdownViewer markdown={courseResult} />
-          </div>
-        )}
-      </div>
       )}
       <SpeedInsights />
       <Analytics />
