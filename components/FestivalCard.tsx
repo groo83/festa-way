@@ -3,10 +3,10 @@ import React from 'react';
 
 interface FestivalCardProps {
   fest: Festival;
-  onSelect: (name: string, location: string) => void;
+  onSelect: (fest: Festival) => void;
 }
 
-export default function FestivalCard({ fest, onSelect}: FestivalCardProps) {
+export default function FestivalCard({ fest, onSelect }: FestivalCardProps) {
   return (
     
     <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 ease-in-out border border-gray-100 h-full w-full flex flex-col justify-between">
@@ -28,7 +28,7 @@ export default function FestivalCard({ fest, onSelect}: FestivalCardProps) {
       </div>
       <button
           className="mt-auto w-full px-5 py-2 font-semibold text-white rounded-lg bg-gradient-to-r from-[#ff6b6b] via-[#4ecdc4] to-[#45b7d1] bg-[length:200%_200%] animate-[gradientShift_4s_ease-in-out_infinite] shadow-md hover:shadow-lg cursor-pointer transition-all"
-          onClick={() => onSelect(fest.name, fest.location ? fest.location.split(' ')[0] + ' ' + fest.location.split(' ')[1] : '')}
+          onClick={() => onSelect(fest)}
       >
         이 축제로 코스 추천받기
       </button>

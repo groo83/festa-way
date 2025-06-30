@@ -11,9 +11,9 @@ import Loading from '../components/Loding';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'search' | 'recommend'>('search');
-  const [selectedFestival, setSelectedFestival] = useState('');
+  const [selectedFestivalName, setSelectedFestivalName] = useState('');
   const [selectedFestivalLocation, setSelectedFestivalLocation] = useState('');
-  const todayStr = new Date().toISOString().slice(0, 10); // yyyy-mm-dd 형식
+  const todayStr = new Date().toISOString().slice(0, 10); 
   const [startDate, setStartDate] = useState(todayStr);  const [endDate, setEndDate] = useState('');
   const [keyword, setKeyword] = useState<string>('');
   const [region, setRegion] = useState('');
@@ -26,7 +26,6 @@ export default function Home() {
   const tripOptions = ['당일치기','1박 2일','2박 3일','3박 4일','4박 5일'];
   const allKeywords = ['가족', '음식', '자연', '포토존', '걷기', '예술', '역사', '책'];
   const allRegions = ['서울', '경기도', '대전', '대구', '광주', '부산','울산', '세종특별자치시', '강원특별자치도', '충청북도', '충청남도', '경상북도', '경상남도', '전북특별자치도', '전라남도', '제주도']; 
-  const message =  keyword + ' ' + region + '조건으로 축제를 추천받고 있어요.';
 
   const selectTrip = (option: string) => {
     setTripType(option);
@@ -64,9 +63,9 @@ export default function Home() {
     }
   };
 
-  const handleSelectFestival = (name: string, location: string) => {
-    setSelectedFestival(name);
-    setSelectedFestivalLocation(location)
+  const handleSelectFestival = (fest: Festival) => {
+    setSelectedFestivalName(fest.name);
+    setSelectedFestivalLocation(fest.location)
     setActiveTab('recommend');
   };
 
@@ -75,7 +74,7 @@ export default function Home() {
     setIsCourseLoading(true);
     try {
       const locationText = selectedFestivalLocation ? `(${selectedFestivalLocation}) 에서 진행하는 ` : '';
-      const questionText = locationText + selectedFestival + ' 관련해서 ' + tripType + ' 코스를 짜줘.';
+      const questionText = locationText + selectedFestivalName + ' 관련해서 ' + tripType + ' 코스를 짜줘.';
 
       const response = await axios.post('/api/v1/course', { question: questionText });
       console.log(response.data);
@@ -106,7 +105,7 @@ export default function Home() {
   };
   
   const validateRecommendInput = (): boolean => {
-    if (!selectedFestival.trim()) {
+    if (!selectedFestivalName.trim()) {
       alert('축제명을 입력해 주세요.');
       return false;
     }
@@ -321,11 +320,17 @@ export default function Home() {
               id="festival-input"
               list="festival-region-list"
               type="text"
-              value={selectedFestival}
+              value={selectedFestivalName}
               onChange={(e) => {
-                // todo : 축제명과 지역명을 분리해서 저장
-                setSelectedFestival(e.target.value);
-                
+                  const inputValue = e.target.value;
+                  setSelectedFestivalName(inputValue);
+              
+                  const matchedFestival = festivalList.find(f => f.name === inputValue);
+                  if (matchedFestival) {
+                    setSelectedFestivalLocation(matchedFestival.location);
+                  } else {
+                    setSelectedFestivalLocation(''); 
+                  }
                 }
               }
               placeholder="예) 해운대 모래축제, 서울"
@@ -371,7 +376,7 @@ export default function Home() {
               onClick={handleCourseRecommend}>🎯 코스 추천받기</button>
             <button
               onClick={() => {
-                setSelectedFestival('');
+                setSelectedFestivalName('');
                 setSelectedFestivalLocation('');
                 setTripType('');
                 setCourseResult('');
