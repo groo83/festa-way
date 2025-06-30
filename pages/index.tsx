@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { parseFestivalContent, Festival } from '../utils/parseFestivalContent';
 import FestivalCard from '../components/FestivalCard';
@@ -148,6 +148,27 @@ export default function Home() {
     }
   };
   
+  const resetSearchFilters = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    setStartDate(today);
+    setEndDate('');
+    setKeyword('');
+    setRegion('');
+    setFestivalList([]);
+  };
+  
+  const resetRecommendation = () => {
+    setSelectedFestivalName('');
+    setSelectedFestivalLocation('');
+    setTripType('');
+    setCourseResult('');
+  };
+  
+  useEffect(() => {
+    const matched = festivalList.find(f => f.name === selectedFestivalName);
+    setSelectedFestivalLocation(matched?.location || '');
+  }, [selectedFestivalName, festivalList]);
+
   return (
     <div className="container">
       <header>
@@ -161,7 +182,7 @@ export default function Home() {
           <button onClick={() => setActiveTab('recommend')} className={`tab-btn ${activeTab === 'recommend' ? 'active-tab' : ''}`}>✏️ 코스 추천받기</button>
         </div>
       </header>
-      
+
       {errorMessage && (
         <ErrorToast
           message={errorMessage}
@@ -252,14 +273,7 @@ export default function Home() {
               🎯 검색
             </button>              
             <button
-              onClick={() => {
-                const today = new Date().toISOString().slice(0, 10);
-                setStartDate(today);
-                setEndDate('');
-                setKeyword('');
-                setRegion('');
-                setFestivalList([]);
-              }}
+              onClick={resetSearchFilters}
               title="조건 초기화"
               className="flex items-center gap-1 px-3 py-2 bg-gray-200 hover:bg-red-100 text-gray-700 hover:text-red-600 rounded-md shadow-sm transition-all"
             >
@@ -339,18 +353,7 @@ export default function Home() {
               list="festival-region-list"
               type="text"
               value={selectedFestivalName}
-              onChange={(e) => {
-                  const inputValue = e.target.value;
-                  setSelectedFestivalName(inputValue);
-              
-                  const matchedFestival = festivalList.find(f => f.name === inputValue);
-                  if (matchedFestival) {
-                    setSelectedFestivalLocation(matchedFestival.location);
-                  } else {
-                    setSelectedFestivalLocation(''); 
-                  }
-                }
-              }
+              onChange={(e) => setSelectedFestivalName(e.target.value)}              
               placeholder="예) 해운대 모래축제, 서울"
               className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4ecdc4] focus:border-[#4ecdc4]"
             />
@@ -393,12 +396,7 @@ export default function Home() {
               className="px-5 py-2 font-semibold text-white rounded-md bg-gradient-to-r from-[#ff6b6b] via-[#4ecdc4] to-[#45b7d1] bg-[length:200%_200%] animate-[gradientShift_4s_ease-in-out_infinite] shadow-md hover:shadow-lg cursor-pointer transition-all"
               onClick={handleCourseRecommend}>🎯 코스 추천받기</button>
             <button
-              onClick={() => {
-                setSelectedFestivalName('');
-                setSelectedFestivalLocation('');
-                setTripType('');
-                setCourseResult('');
-              }}
+              onClick={resetRecommendation}
               title="조건 초기화"
               className="flex items-center gap-1 px-3 py-2 bg-gray-200 hover:bg-red-100 text-gray-700 hover:text-red-600 rounded-md shadow-sm transition-all"
             >
