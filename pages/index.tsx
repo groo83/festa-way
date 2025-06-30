@@ -8,6 +8,7 @@ import { Analytics } from '@vercel/analytics/next';
 import Footer from '../components/Footer'; 
 import MarkdownViewer from '../components/MarkdownViewer';
 import Loading from '../components/Loding';
+import ErrorToast from '../components/ErrorToast';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'search' | 'recommend'>('search');
@@ -26,6 +27,7 @@ export default function Home() {
   const tripOptions = ['당일치기','1박 2일','2박 3일','3박 4일','4박 5일'];
   const allKeywords = ['가족', '음식', '자연', '포토존', '걷기', '예술', '역사', '책'];
   const allRegions = ['서울', '경기도', '대전', '대구', '광주', '부산','울산', '세종특별자치시', '강원특별자치도', '충청북도', '충청남도', '경상북도', '경상남도', '전북특별자치도', '전라남도', '제주도']; 
+  const [errorMessage, setErrorMessage] = useState('');
 
   const selectTrip = (option: string) => {
     setTripType(option);
@@ -48,16 +50,17 @@ export default function Home() {
     let questionText = buildQuestionText();
 
     try {
-      const response = await axios.post('/api/v1/festival', { question: questionText });
-      console.log(response.data);
+      const result = await postToAPI('/api/v1/course', questionText);
 
-      const content = response.data.result.choices[0].message.content;
-      const isFallback = content.includes("확인되지 않았습니다");
-      const parsedList = parseFestivalContent(content);
+      const isFallback = result.includes("확인되지 않았습니다");
+      const parsedList = parseFestivalContent(result);
       setIsFallbackResult(isFallback);
       setFestivalList(parsedList);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
+      const msg = err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.';
+      setErrorMessage(msg);
+      setFestivalList([]);
     } finally {
       setIsLoading(false);
     }
@@ -76,20 +79,19 @@ export default function Home() {
       const locationText = selectedFestivalLocation ? `(${selectedFestivalLocation}) 에서 진행하는 ` : '';
       const questionText = locationText + selectedFestivalName + ' 관련해서 ' + tripType + ' 코스를 짜줘.';
 
-      const response = await axios.post('/api/v1/course', { question: questionText });
-      console.log(response.data);
-      console.log(response.data.result.choices[0].message.content);
-      setCourseResult(response.data.result.choices[0].message.content || '추천 결과가 없습니다.');
+      const result = await postToAPI('/api/v1/course', questionText);
+      setCourseResult(result ?? '추천 결과가 없습니다.');
     } catch (err) {
-      console.error(err);
-      setCourseResult('추천 요청 중 오류가 발생했습니다.');
+      const msg = err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.';
+      setErrorMessage(msg);
+      setCourseResult('');
     } finally {
       setIsCourseLoading(false);
     }
   };
 
   const validateFestaSearchInput = (): boolean => {
-    if (!startDate && !endDate && keyword.length == 0 && !region) {
+    if (!startDate && !endDate && !keyword && !region) {
       alert('조건을 선택해 주세요.');
       return false;
     }
@@ -136,7 +138,16 @@ export default function Home() {
     return questionText;
   };
 
-
+  const postToAPI = async (endpoint: string, question: string): Promise<string> => {
+    try {
+      const response = await axios.post(endpoint, { question });
+      return response.data.result.choices[0].message.content;
+    } catch (error) {
+      console.error(error);
+      throw new Error('통신 중 오류가 발생했습니다. 다시 시도해 주세요.');
+    }
+  };
+  
   return (
     <div className="container">
       <header>
@@ -150,6 +161,13 @@ export default function Home() {
           <button onClick={() => setActiveTab('recommend')} className={`tab-btn ${activeTab === 'recommend' ? 'active-tab' : ''}`}>✏️ 코스 추천받기</button>
         </div>
       </header>
+      
+      {errorMessage && (
+        <ErrorToast
+          message={errorMessage}
+          onClose={() => setErrorMessage('')}
+        />
+      )}
 
       {activeTab === 'search' && (
         <div className="search-tab">
@@ -158,7 +176,7 @@ export default function Home() {
             }`}
           >
             {/* 날짜 조건 */}
-            <div className="grid grid-cols-1 grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
               <label
                 htmlFor="start-date"
@@ -189,7 +207,7 @@ export default function Home() {
 
               </div>
             </div>
-            <div className="grid grid-cols-1 grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             {/* <div className="flex flex-col sm:flex-row gap-4 items-center w-full"> */}
               {/* 지역 콤보박스 */}
@@ -339,7 +357,7 @@ export default function Home() {
             <datalist id="festival-region-list">
               {/* 이미 불러온 축제 리스트가 있다면, 그 이름들도 추가 */}
               {festivalList.map((f) => (
-                <option key={f.name} value={f.name} />
+                <option key={`${f.name}-${f.location}`} value={f.name} />
               ))}
               {/* region 옵션 */}
               {allRegions.map((rg) => (
