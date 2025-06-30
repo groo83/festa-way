@@ -47,7 +47,7 @@ const LoadingUI: React.FC<LoadingUIProps> = ({ messages = defaultMessages }) => 
 
         {/* Circular Loading Spinner */}
         <div className="flex justify-center">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-10 h₩-10 sm:w-12 sm:h-12 border-4 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
         </div>
 
         {/* Gradient-styled Message */}

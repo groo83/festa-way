@@ -12,6 +12,7 @@ import Loading from '../components/Loding';
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'search' | 'recommend'>('search');
   const [selectedFestival, setSelectedFestival] = useState('');
+  const [selectedFestivalLocation, setSelectedFestivalLocation] = useState('');
   const todayStr = new Date().toISOString().slice(0, 10); // yyyy-mm-dd 형식
   const [startDate, setStartDate] = useState(todayStr);  const [endDate, setEndDate] = useState('');
   const [keyword, setKeyword] = useState<string>('');
@@ -63,8 +64,9 @@ export default function Home() {
     }
   };
 
-  const handleSelectFestival = (name: string) => {
+  const handleSelectFestival = (name: string, location: string) => {
     setSelectedFestival(name);
+    setSelectedFestivalLocation(location)
     setActiveTab('recommend');
   };
 
@@ -72,7 +74,8 @@ export default function Home() {
     if (!validateRecommendInput()) return;
     setIsCourseLoading(true);
     try {
-      const questionText = selectedFestival + ' 관련해서 ' + tripType + ' 코스를 짜줘.';
+      const locationText = selectedFestivalLocation ? `(${selectedFestivalLocation}) 에서 진행하는 ` : '';
+      const questionText = locationText + selectedFestival + ' 관련해서 ' + tripType + ' 코스를 짜줘.';
 
       const response = await axios.post('/api/v1/course', { question: questionText });
       console.log(response.data);
@@ -319,7 +322,12 @@ export default function Home() {
               list="festival-region-list"
               type="text"
               value={selectedFestival}
-              onChange={(e) => setSelectedFestival(e.target.value)}
+              onChange={(e) => {
+                // todo : 축제명과 지역명을 분리해서 저장
+                setSelectedFestival(e.target.value);
+                
+                }
+              }
               placeholder="예) 해운대 모래축제, 서울"
               className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4ecdc4] focus:border-[#4ecdc4]"
             />
@@ -364,6 +372,7 @@ export default function Home() {
             <button
               onClick={() => {
                 setSelectedFestival('');
+                setSelectedFestivalLocation('');
                 setTripType('');
                 setCourseResult('');
               }}
