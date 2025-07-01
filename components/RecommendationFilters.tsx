@@ -36,7 +36,7 @@ const RecommendationFilters: React.FC<RecommendationFiltersProps> = ({
           value={selectedFestivalName}
           onChange={(e) => onChangeFestivalName(e.target.value)}
           placeholder="예) 해운대 모래축제, 서울"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4ecdc4] focus:border-[#4ecdc4]"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#4ecdc4] focus:border-[#4ecdc4]"
         />
         <datalist id="festival-region-list">
           {festivalList.map((f) => (

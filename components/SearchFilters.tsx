@@ -67,7 +67,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
             id="region-select"
             value={region}
             onChange={(e) => onChangeRegion(e.target.value)}
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#45b7d1] focus:border-[#45b7d1] min-h-[44px]"
+            className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#45b7d1] focus:border-[#45b7d1] min-h-[44px]"
             disabled={isLoading}
           >
             <option value="">전체</option>
@@ -83,7 +83,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
             id="keyword-select"
             value={keyword}
             onChange={(e) => onChangeKeyword(e.target.value)}
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4ecdc4] focus:border-[#4ecdc4] min-h-[44px]"
+            className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#45b7d1] focus:border-[#45b7d1] min-h-[44px]"
           >
             <option value="">전체</option>
             {allKeywords.map(kw => (
